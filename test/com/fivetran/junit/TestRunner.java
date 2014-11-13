@@ -1,8 +1,13 @@
 package com.fivetran.junit;
 
-@org.junit.runner.RunWith(org.junit.runners.AllTests.class)
+import com.fivetran.junit.TestNS;
+import junit.framework.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.AllTests;
+
+@RunWith(AllTests.class)
 public class TestRunner {
-    public static junit.framework.Test suite() {
+    public static Test suite() {
         return TestNS.suites("com.fivetran.junit.example-spec");
     }
 }
