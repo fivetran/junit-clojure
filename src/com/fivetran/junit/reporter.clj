@@ -14,8 +14,11 @@
                                 actual :actual
                                 file :file
                                 line :line}]
-  ;; TODO file / line
-  (TestCase/failNotEquals message expected actual))
+  (let [context (test/testing-contexts-str)
+        location (str \< file \: line \>)
+        alt-message (str context " " location)
+        message (or message alt-message)]
+    (TestCase/failNotEquals message expected actual)))
 
 (defmethod junit-report :error [{actual :actual}]
   (throw actual))
