@@ -10,7 +10,11 @@
   (testing "a is b"
     (is (= \a \b))))
 
-(deftest throws-error
+(deftest expected-error
+  (testing "throw Exception"
+    (is (thrown? Exception (throw (Exception. "Expected"))))))
+
+(deftest unexpected-error
   (testing "throw Exception"
     (throw (Exception. "I'm an uncaught exception in a test!"))))
 
