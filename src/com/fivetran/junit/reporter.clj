@@ -33,9 +33,10 @@
   with *testing-vars* bound to (conj *testing-vars* v)."
   {:dynamic true, :added "1.1"}
   [v]
-  (when-let [t (:test (meta v))]
+  (when-let [{t :test
+              n :name} (meta v)]
     (binding [test/*testing-vars* (conj test/*testing-vars* v)]
-      (proxy [TestCase] [(:name v)]
+      (proxy [TestCase] [(name n)]
         (runTest []
           (t))))))
 
