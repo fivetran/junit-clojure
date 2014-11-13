@@ -87,3 +87,30 @@
         (.addTest suite case)))
 
     suite))
+
+(defn assert-equals
+  "Returns generic assertion code for any functional predicate.  The
+  'expected' argument to 'report' will contains the original form, the
+  'actual' argument will contain the form with all its sub-forms
+  evaluated.  If the predicate returns false, the 'actual' form will
+  be wrapped in (not...)."
+  {:added "1.1"}
+  [msg form]
+  (let [args (rest form)
+        pred (first form)]
+    `(let [values# (list ~@args)
+           result# (apply ~pred values#)
+           expected# (first values#)
+           actual# (second values#)]
+       (if result#
+         (test/do-report {:type :pass, :message ~msg,
+                          :expected expected#, :actual actual#})
+         (test/do-report {:type :fail, :message ~msg,
+                          :expected expected#, :actual actual#}))
+       result#)))
+
+(defmethod test/assert-expr '= [msg form]
+  (let [args (rest form)]
+    (if (= 2 (count args))
+      (assert-equals msg form)
+      (test/assert-predicate msg form))))
