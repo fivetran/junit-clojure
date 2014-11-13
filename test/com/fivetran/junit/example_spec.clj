@@ -10,4 +10,8 @@
   (testing "a is b"
     (is (= \a \b))))
 
+(deftest throws-error
+  (testing "throw Exception"
+    (throw (Exception. "I'm an uncaught exception in a test!"))))
+
 (def non-test-var "This var doesn't have :test metadata")
