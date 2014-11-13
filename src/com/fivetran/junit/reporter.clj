@@ -1,5 +1,5 @@
 (ns com.fivetran.junit.reporter
-  (:import (junit.framework TestCase))
+  (:import (junit.framework TestCase TestSuite))
   (:require [clojure.test :as test]))
 
 (def ^{:dynamic true
@@ -9,10 +9,16 @@
           "Intercept clojure test reports and forward them to JUnit"
           :type)
 
-(defmethod junit-report :fail [m]
-  (println m)
+(defmethod junit-report :fail [{message :message
+                                expected :expected
+                                actual :actual
+                                file :file
+                                line :line}]
+  ;; TODO file / line
+  (TestCase/failNotEquals message expected actual))
 
-  (original-report m))
+(defmethod junit-report :error [{actual :actual}]
+  (throw actual))
 
 (defmethod junit-report :default [m]
   (original-report m))
@@ -60,10 +66,16 @@
   *report-counters*."
   {:added "1.1"}
   [ns]
-  (binding [original-report test/report]
-    (binding [test/report junit-report]
-      (let [ns-obj (the-ns ns)
-            grouped (test-all-vars ns-obj)
-            tests (flatten grouped)
-            somes (filter some? tests)]
-        (into-array TestCase somes)))))
+  (let [ns-obj (the-ns ns)
+        grouped (test-all-vars ns-obj)
+        tests (flatten grouped)
+        somes (filter some? tests)
+        suite (proxy [TestSuite] [(name ns)]
+                (run [test-result]
+                  (binding [original-report test/report]
+                    (binding [test/report junit-report]
+                      (proxy-super run test-result)))))]
+    (doseq [case somes]
+      (.addTest suite case))
+
+    suite))
