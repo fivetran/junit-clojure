@@ -5,8 +5,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.AllTests;
 
 @RunWith(AllTests.class)
-public class ExampleSpec {
+public class TestRunner {
     public static Test suite() {
-        return TestNS.suite("com.fivetran.junit.example-spec");
+        return TestNS.suites("com.fivetran.junit.example-spec");
     }
 }

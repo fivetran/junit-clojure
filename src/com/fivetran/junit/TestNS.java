@@ -5,14 +5,20 @@ import clojure.lang.IFn;
 import junit.framework.TestSuite;
 
 public abstract class TestNS {
-    public static TestSuite suite(String namespace) {
-        IFn require = Clojure.var("clojure.core", "require");
-        require.invoke(Clojure.read("com.fivetran.junit.reporter"));
-        require.invoke(Clojure.read(namespace));
+    public static TestSuite suites(String... namespaces) {
+        TestSuite rootSuite = new TestSuite();
 
-        IFn testNs = Clojure.var("com.fivetran.junit.reporter", "test-ns");
-        TestSuite suite = (TestSuite) testNs.invoke(Clojure.read(namespace));
+        for (String namespace : namespaces) {
+            IFn require = Clojure.var("clojure.core", "require");
+            require.invoke(Clojure.read("com.fivetran.junit.reporter"));
+            require.invoke(Clojure.read(namespace));
 
-        return suite;
+            IFn testNs = Clojure.var("com.fivetran.junit.reporter", "test-ns");
+            TestSuite nsSuite = (TestSuite) testNs.invoke(Clojure.read(namespace));
+
+            rootSuite.addTest(nsSuite);
+        }
+
+        return rootSuite;
     }
 }
