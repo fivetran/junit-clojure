@@ -25,6 +25,7 @@ In maven, you do this:
     <build>
         ...
         <plugins>
+            ...
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -36,6 +37,7 @@ In maven, you do this:
                     </additionalClasspathElements>
                 </configuration>
             </plugin>
+            ...
         </plugins>
         ...
     </build>
