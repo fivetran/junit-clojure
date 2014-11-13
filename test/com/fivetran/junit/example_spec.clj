@@ -2,6 +2,22 @@
   (:require [com.fivetran.junit.reporter :as reporter])
   (:use clojure.test))
 
+(def ^:dynamic once-nil nil)
+
+(def ^:dynamic each-nil nil)
+
+(defn set-once [tests]
+  (binding [once-nil "something"]
+    (tests)))
+
+(defn set-each [tests]
+  (binding [each-nil "something"]
+    (tests)))
+
+(use-fixtures :once set-once)
+
+(use-fixtures :each set-each)
+
 (deftest succeeds
   (testing "one is one"
     (is (= 1 1))))
@@ -17,5 +33,13 @@
 (deftest unexpected-error
   (testing "throw Exception"
     (throw (Exception. "I'm an uncaught exception in a test!"))))
+
+(deftest once-fixture
+  (testing "should run set-once"
+    (is (= "something" once-nil))))
+
+(deftest each-fixture
+  (testing "should run set-each"
+    (is (= "something" each-nil))))
 
 (def non-test-var "This var doesn't have :test metadata")

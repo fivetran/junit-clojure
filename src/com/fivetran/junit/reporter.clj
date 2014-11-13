@@ -35,24 +35,24 @@
   "If v has a function in its :test metadata, calls that function,
   with *testing-vars* bound to (conj *testing-vars* v)."
   {:dynamic true, :added "1.1"}
-  [v]
+  [v each]
   (when-let [{t :test
               n :name} (meta v)]
     (binding [test/*testing-vars* (conj test/*testing-vars* v)]
       (proxy [TestCase] [(name n)]
         (runTest []
-          (t))))))
+          (each
+            t))))))
 
 (defn test-vars
   "Wraps each var in a TestCase"
   {:added "1.6"}
   [vars]
   (for [[ns vars] (group-by (comp :ns meta) vars)]
-    (let [once-fixture-fn (test/join-fixtures (::once-fixtures (meta ns)))
-          each-fixture-fn (test/join-fixtures (::each-fixtures (meta ns)))]
+    (let [each-fixture-fn (test/join-fixtures (:clojure.test/each-fixtures (meta ns)))]
       (for [v vars]
         (when (:test (meta v))
-          (test-var v))))))
+          (test-var v each-fixture-fn))))))
 
 (defn test-all-vars
   "Calls test-vars on every var interned in the namespace, with fixtures."
@@ -71,6 +71,7 @@
   {:added "1.1"}
   [ns]
   (let [ns-obj (the-ns ns)
+        once-fixture-fn (test/join-fixtures (:clojure.test/once-fixtures (meta ns-obj)))
         grouped (test-all-vars ns-obj)
         tests (flatten grouped)
         somes (filter some? tests)
@@ -78,8 +79,11 @@
                 (run [test-result]
                   (binding [original-report test/report]
                     (binding [test/report junit-report]
-                      (proxy-super run test-result)))))]
-    (doseq [case somes]
-      (.addTest suite case))
+                      (once-fixture-fn
+                        (fn []
+                          (proxy-super run test-result)))))))]
+    (binding [*compiler-options* (assoc *compiler-options* :disable-locals-clearing true)]
+      (doseq [case somes]
+        (.addTest suite case)))
 
     suite))
