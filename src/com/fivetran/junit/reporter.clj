@@ -70,23 +70,27 @@
   *report-counters*."
   {:added "1.1"}
   [ns]
-  (let [ns-obj (the-ns ns)
-        once-fixture-fn (test/join-fixtures (:clojure.test/once-fixtures (meta ns-obj)))
-        grouped (test-all-vars ns-obj)
-        tests (flatten grouped)
-        somes (filter some? tests)
-        suite (proxy [TestSuite] [(name ns)]
-                (run [test-result]
-                  (binding [original-report test/report]
-                    (binding [test/report junit-report]
-                      (once-fixture-fn
-                        (fn []
-                          (proxy-super run test-result)))))))]
-    (binding [*compiler-options* (assoc *compiler-options* :disable-locals-clearing true)]
+  (binding [*compiler-options* (assoc *compiler-options* :disable-locals-clearing true)]
+    (let [ns-obj (the-ns ns)
+          once-fixture-fn (test/join-fixtures (:clojure.test/once-fixtures (meta ns-obj)))
+          grouped (test-all-vars ns-obj)
+          tests (flatten grouped)
+          somes (filter some? tests)
+          suite (proxy [TestSuite] [(name ns)]
+                  (run [test-result]
+                    (binding [original-report test/report]
+                      (binding [test/report junit-report]
+                        (once-fixture-fn
+                          (fn []
+                            (proxy-super run test-result)))))))]
       (doseq [case somes]
-        (.addTest suite case)))
+        (.addTest suite case))
 
-    suite))
+      suite)))
+
+(defn require-debug [ns]
+  (binding [*compiler-options* (assoc *compiler-options* :disable-locals-clearing true)]
+    (require ns)))
 
 (defn assert-equals
   "Returns generic assertion code for any functional predicate.  The

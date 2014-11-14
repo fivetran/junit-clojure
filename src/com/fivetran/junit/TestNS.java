@@ -11,7 +11,9 @@ public abstract class TestNS {
         for (String namespace : namespaces) {
             IFn require = Clojure.var("clojure.core", "require");
             require.invoke(Clojure.read("com.fivetran.junit.reporter"));
-            require.invoke(Clojure.read(namespace));
+
+            IFn requireDebug = Clojure.var("com.fivetran.junit.reporter", "require-debug");
+            requireDebug.invoke(Clojure.read(namespace));
 
             IFn testNs = Clojure.var("com.fivetran.junit.reporter", "test-ns");
             TestSuite nsSuite = (TestSuite) testNs.invoke(Clojure.read(namespace));

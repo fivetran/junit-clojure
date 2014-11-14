@@ -18,6 +18,20 @@
 
 (use-fixtures :each set-each)
 
+(deftest dont-clear-locals
+  (testing "should not be cleared in debugger"
+    (let [a (list 1)
+          b (list 2)
+          c (list 3)
+          d (list a b c)
+          e (list 1)
+          f (list 2)
+          g (list 3)]
+      (is d)
+      (is e)
+      (is f)
+      (is g))))
+
 (deftest succeeds
   (testing "one is one"
     (is (= 1 1))))
