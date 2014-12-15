@@ -114,14 +114,14 @@
 
         <repository>
             <id>aws-release</id>
-            <name>AWS Release Repository</name>
-            <url>s3://fivetran-maven/release</url>
+            <name>AWS Public Release Repository</name>
+            <url>https://s3.amazonaws.com/fivetran-maven/public/release</url>
         </repository>
 
         <repository>
             <id>aws-snapshot</id>
-            <name>AWS Snapshot Repository</name>
-            <url>s3://fivetran-maven/snapshot</url>
+            <name>AWS Public Snapshot Repository</name>
+            <url>https://s3.amazonaws.com/fivetran-maven/public/snapshot</url>
         </repository>
     </repositories>
 
@@ -130,13 +130,13 @@
         <repository>
             <id>aws-release</id>
             <name>AWS Release Repository</name>
-            <url>s3://fivetran-maven/release</url>
+            <url>s3://fivetran-maven/public/release</url>
         </repository>
 
         <snapshotRepository>
             <id>aws-snapshot</id>
             <name>AWS Snapshot Repository</name>
-            <url>s3://fivetran-maven/snapshot</url>
+            <url>s3://fivetran-maven/public/snapshot</url>
         </snapshotRepository>
     </distributionManagement>
 </project>
